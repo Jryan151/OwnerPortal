@@ -18,8 +18,8 @@
 
             <div class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4 shadow-xl">
                 <div>
-                    <label class="block text-xs text-zinc-400 mb-1 font-medium text-left">Enter Owner PIN</label>
-                    <input type="password" id="ownerPinInput" placeholder="Enter PIN (1234)" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 text-center tracking-widest font-mono">
+                    <label class="block text-xs text-zinc-400 mb-1 font-medium text-left">Enter Credentials</label>
+                    <input type="password" id="ownerPinInput" placeholder="Password or PIN" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 text-center tracking-widest font-mono">
                 </div>
                 <button onclick="verifyOwnerPin()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-pink-600/20">Enter Portal</button>
             </div>
@@ -49,7 +49,7 @@
             </div>
             
             <!-- Info Tab Button -->
-            <button onclick="switchOwnerTab('Info')" id="tabBtnInfo" class="w-full bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 font-semibold py-2 rounded-xl text-[11px] transition mb-4">ℹ️ Portal Info & Guide</button>
+            <button onclick="switchOwnerTab('Info')" id="tabBtnInfo" class="w-full bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 font-semibold py-2 rounded-xl text-[11px] transition mb-4">ℹ️ Portal Info & Settings</button>
 
             <!-- Tab 1: Orders -->
             <div id="ownerTabOrders" class="space-y-4">
@@ -171,11 +171,10 @@
                 </div>
             </div>
 
-            <!-- Tab 5: Info Guide -->
+            <!-- Tab 5: Info Guide & Settings -->
             <div id="ownerTabInfo" class="space-y-4 hidden">
                 <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4">
                     <h3 class="font-bold text-lg text-pink-500 border-b border-zinc-800 pb-2">Owner Portal Guide</h3>
-                    <p class="text-xs text-zinc-300 leading-relaxed">Welcome to your management dashboard! Here is a quick breakdown of your tools:</p>
                     
                     <div class="space-y-3">
                         <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
@@ -185,35 +184,66 @@
                                 <li><strong>Store Status:</strong> Toggle your truck Open or Closed for customers.</li>
                                 <li><strong>Wait Times:</strong> Add extra minutes to the estimated wait during busy rushes.</li>
                                 <li><strong>Prep Times:</strong> Customize individual prep times for items to accurately calculate order wait times.</li>
-                                <li><strong>Timesheets:</strong> Log your truck's operational hours and individual employee shift hours.</li>
                             </ul>
                         </div>
                         
                         <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
-                            <div class="font-bold text-pink-400 text-sm mb-1">📦 Inventory Tab</div>
+                            <div class="font-bold text-pink-400 text-sm mb-1">📦 Inventory & Locations</div>
                             <ul class="text-xs text-zinc-400 space-y-1.5 list-disc pl-4">
-                                <li><strong>Menu Editor:</strong> Add new menu items or edit existing descriptions and prices.</li>
-                                <li><strong>Sales & Markdowns:</strong> Apply temporary discounted sale prices to items.</li>
-                                <li><strong>Sold Out:</strong> Quickly tap "Sold Out" to hide an item from the customer menu.</li>
+                                <li><strong>Menu Editor:</strong> Add items, edit descriptions, set Markdown Sales, or mark items Sold Out.</li>
+                                <li><strong>Active Route:</strong> Changing the Active Location instantly updates the customer website map in real-time.</li>
                             </ul>
+                        </div>
+                    </div>
+
+                    <!-- Customer Guide Viewer -->
+                    <div class="bg-zinc-950 p-4 rounded-lg border border-zinc-800 space-y-3 mt-4">
+                        <div class="font-bold text-emerald-400 text-sm mb-1">📱 Customer Guide (Preview)</div>
+                        <p class="text-[10px] text-zinc-500 mb-2">This is the ordering guide shown to your customers.</p>
+                        
+                        <div class="space-y-2">
+                            <div class="bg-zinc-900 p-2.5 rounded border border-zinc-800">
+                                <div class="font-bold text-zinc-200 text-xs mb-1">🌮 1. Place Order</div>
+                                <p class="text-[10px] text-zinc-400">Customers browse the menu, customize items, and add notes before checkout.</p>
+                            </div>
+                            <div class="bg-zinc-900 p-2.5 rounded border border-zinc-800">
+                                <div class="font-bold text-zinc-200 text-xs mb-1">📍 2. Track & Wait</div>
+                                <p class="text-[10px] text-zinc-400">They receive a Ticket Number and check the Order Tracker for live estimated wait times.</p>
+                            </div>
+                            <div class="bg-zinc-900 p-2.5 rounded border border-zinc-800">
+                                <div class="font-bold text-zinc-200 text-xs mb-1">✅ 3. Pick Up</div>
+                                <p class="text-[10px] text-zinc-400">When the order is marked <strong class="text-emerald-400">Ready</strong>, they show their ticket at the window.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Settings Section -->
+                    <div class="bg-zinc-950 p-4 rounded-lg border border-zinc-800 space-y-3 mt-4">
+                        <div class="font-bold text-rose-400 text-sm mb-1">🔒 Security Settings</div>
+                        <p class="text-[10px] text-zinc-500 mb-2">Create or reset your portal password here.</p>
+                        
+                        <div>
+                            <label class="block text-[11px] text-zinc-400 mb-1">Access Type</label>
+                            <select id="authTypeSelect" onchange="toggleAuthType()" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs text-zinc-200">
+                                <option value="pin">Number PIN</option>
+                                <option value="text">Text Password</option>
+                            </select>
                         </div>
                         
-                        <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
-                            <div class="font-bold text-pink-400 text-sm mb-1">📍 Locations Tab</div>
-                            <ul class="text-xs text-zinc-400 space-y-1.5 list-disc pl-4">
-                                <li><strong>Addresses:</strong> Add, edit, or delete truck locations for your schedule.</li>
-                                <li><strong>Active Route:</strong> Select which location is currently active to display it on the customer website.</li>
-                            </ul>
+                        <div id="pinLengthDiv">
+                            <label class="block text-[11px] text-zinc-400 mb-1">PIN Length</label>
+                            <select id="authPinLength" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs text-zinc-200">
+                                <option value="4">4 Digits</option>
+                                <option value="6">6 Digits</option>
+                            </select>
                         </div>
                         
-                        <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800">
-                            <div class="font-bold text-pink-400 text-sm mb-1">📊 Analytics Tab</div>
-                            <ul class="text-xs text-zinc-400 space-y-1.5 list-disc pl-4">
-                                <li><strong>Revenue:</strong> Track your real-time daily, weekly, and yearly sales.</li>
-                                <li><strong>Efficiency:</strong> Monitor average kitchen wait times to spot bottlenecks.</li>
-                                <li><strong>Clear Logs:</strong> Reset analytics and history when starting a new financial period.</li>
-                            </ul>
+                        <div class="space-y-2 pt-1">
+                            <input type="password" id="newAuthVal" placeholder="Enter New Password/PIN" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs text-zinc-200 text-center tracking-widest font-mono">
+                            <input type="password" id="confirmAuthVal" placeholder="Confirm Password/PIN" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs text-zinc-200 text-center tracking-widest font-mono">
                         </div>
+                        
+                        <button onclick="saveNewAuth()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-semibold py-2 rounded-lg text-xs transition mt-2">Update Credentials</button>
                     </div>
                 </div>
             </div>
@@ -251,6 +281,8 @@
 
     <script>
         const app = {
+            get ownerAuth() { return JSON.parse(localStorage.getItem('foodtruck_auth')) || { type: 'pin', length: 4, value: '1234' }; },
+            set ownerAuth(val) { localStorage.setItem('foodtruck_auth', JSON.stringify(val)); },
             get locations() { return JSON.parse(localStorage.getItem('foodtruck_locations')) || [
                 { id: 1, name: "Trunk or Treat", address: "3541 W Thunderbird Rd, Phoenix, AZ 85053" },
                 { id: 2, name: "Laguna @Arrowhead", address: "20251 N 75th ave Glendale, AZ" },
@@ -296,13 +328,14 @@
         };
 
         function verifyOwnerPin() {
-            const pin = document.getElementById('ownerPinInput').value.trim();
-            if (pin === "1234") {
+            const input = document.getElementById('ownerPinInput').value.trim();
+            const auth = app.ownerAuth;
+            if (input === auth.value) {
                 document.getElementById('loginView').style.display = 'none';
                 document.getElementById('ownerDashboardView').style.display = 'block';
                 initOwnerPortal();
             } else {
-                alert("Incorrect PIN! Hint: 1234");
+                alert("Incorrect Credentials!");
             }
         }
 
@@ -318,13 +351,11 @@
                 const btn = document.getElementById(`tabBtn${t}`);
                 if (el) el.style.display = (t === tabName) ? 'block' : 'none';
                 
-                // Update styling for the standard tabs
                 if (btn && t !== 'Info') {
                     btn.className = (t === tabName) ? 
                         "bg-pink-600 text-white font-semibold py-2 rounded-xl text-[11px] transition shadow" : 
                         "bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2 rounded-xl text-[11px] transition";
                 }
-                // Info button has slightly different persistent styling
                 if (btn && t === 'Info') {
                      btn.className = (t === tabName) ? 
                         "w-full bg-pink-600 text-white font-semibold py-2 rounded-xl text-[11px] transition mb-4 shadow" : 
@@ -342,10 +373,36 @@
             updateStoreStatusUI();
             updateWaitTimeUI();
             updateTimesheetUI();
+            toggleAuthType(); 
             document.getElementById('closingTimeInput').value = app.closingTime;
             renderOwnerPortal();
             renderOwnerMenuEditor();
             renderLocationManagerList();
+        }
+
+        function toggleAuthType() {
+            const type = document.getElementById('authTypeSelect').value;
+            document.getElementById('pinLengthDiv').style.display = (type === 'pin') ? 'block' : 'none';
+        }
+
+        function saveNewAuth() {
+            const type = document.getElementById('authTypeSelect').value;
+            const length = document.getElementById('authPinLength').value;
+            const val1 = document.getElementById('newAuthVal').value;
+            const val2 = document.getElementById('confirmAuthVal').value;
+
+            if (!val1) { alert("Credentials cannot be empty."); return; }
+            if (val1 !== val2) { alert("Passwords do not match. Try again."); return; }
+
+            if (type === 'pin') {
+                if (!/^\d+$/.test(val1)) { alert("PIN must contain only numbers."); return; }
+                if (val1.length !== parseInt(length)) { alert(`PIN must be exactly ${length} digits.`); return; }
+            }
+
+            app.ownerAuth = { type, length: parseInt(length), value: val1 };
+            alert("Credentials updated successfully!");
+            document.getElementById('newAuthVal').value = '';
+            document.getElementById('confirmAuthVal').value = '';
         }
 
         function updateStoreStatusUI() {
@@ -367,7 +424,7 @@
         function toggleStoreStatus() {
             app.isOpen = !app.isOpen;
             if (app.isOpen) {
-                app.truckHours += 1.0; // Automatically log main truck hours when opened
+                app.truckHours += 1.0; 
             }
             updateStoreStatusUI();
             updateTimesheetUI();
