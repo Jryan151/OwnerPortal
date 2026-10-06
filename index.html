@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Taco De Ojo - Owner Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen pb-20 flex flex-col justify-between">
+    <div class="max-w-md mx-auto w-full flex-grow">
+        <!-- Password Lock Screen -->
+        <div id="loginView" class="p-6 flex flex-col items-center justify-center min-h-[90vh] text-center">
+            <div class="w-24 h-24 rounded-full border-2 border-amber-500 p-1 mb-4 flex items-center justify-center shadow-lg shadow-amber-500/10">
+                <span class="text-4xl">🔐</span>
+            </div>
+            <h1 class="text-3xl font-serif font-bold italic tracking-wide mb-1 text-amber-500">Owner Portal</h1>
+            <p class="text-zinc-400 text-sm mb-6">El Taco De Ojo Management</p>
+
+            <div class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4 shadow-xl">
+                <div>
+                    <label class="block text-xs text-zinc-400 mb-1 font-medium text-left">Enter Owner PIN</label>
+                    <input type="password" id="ownerPinInput" placeholder="Enter PIN (1234)" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 text-center tracking-widest font-mono">
+                </div>
+                <button onclick="verifyOwnerPin()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-amber-600/20">Enter Portal</button>
+            </div>
+
+            <div class="mt-12 text-center">
+                <a href="index.html" class="text-[10px] text-zinc-600 hover:text-zinc-400 tracking-wider uppercase font-mono">← Back to Customer Site</a>
+            </div>
+        </div>
+
+        <!-- Owner Portal Dashboard (Hidden until unlocked) -->
+        <div id="ownerDashboardView" class="p-4 hidden">
+            <div class="flex items-center justify-between mb-4 border-b border-zinc-900 pb-2">
+                <a href="index.html" class="text-zinc-400 text-sm hover:text-white">← Exit Portal</a>
+                <h2 class="font-bold text-lg text-amber-500">Owner Dashboard</h2>
+                <button onclick="lockOwnerPortal()" class="text-rose-400 text-xs hover:underline">Lock</button>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <button onclick="switchOwnerTab('orders')" id="tabBtnOrders" class="bg-amber-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">Orders</button>
+                <button onclick="switchOwnerTab('menu')" id="tabBtnMenu" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2.5 rounded-xl text-xs transition">Menu Editor</button>
+                <button onclick="switchOwnerTab('locations')" id="tabBtnLocations" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2.5 rounded-xl text-xs transition">Locations</button>
+            </div>
+
+            <!-- Tab 1: Orders -->
+            <div id="ownerTabOrders" class="space-y-4">
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
+                    <h3 class="font-semibold text-sm text-zinc-300">Store Status & Operations</h3>
+                    <div class="flex items-center justify-between bg-zinc-950 p-3 rounded-lg border border-zinc-800 text-xs">
+                        <span>Store Status: <strong id="ownerStatusLabel" class="text-emerald-400">Open</strong></span>
+                        <button onclick="toggleStoreStatus()" id="storeToggleBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">Close Store</button>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center"><h3 class="font-semibold text-sm text-zinc-400">Live Incoming Orders</h3><button onclick="renderOwnerPortal()" class="text-xs text-amber-500 hover:underline">Refresh ↻</button></div>
+                <div class="space-y-3 mb-6" id="ownerOrdersList"></div>
+
+                <h3 class="font-semibold text-sm text-zinc-400 mb-2">Order History Log</h3>
+                <div class="space-y-3 mb-6" id="historyOrdersList"></div>
+            </div>
+
+            <!-- Tab 2: Menu Editor -->
+            <div id="ownerTabMenu" class="space-y-4 hidden">
+                <div class="flex justify-between items-center"><h3 class="font-semibold text-sm text-amber-500">Manage Menu Items</h3><button onclick="openNewMenuModal()" class="bg-pink-600 hover:bg-pink-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">+ Add Item</button></div>
+                <div id="ownerMenuList" class="space-y-3"></div>
+            </div>
+
+            <!-- Tab 3: Locations -->
+            <div id="ownerTabLocations" class="space-y-4 hidden">
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
+                    <h3 class="font-semibold text-sm text-zinc-300">Manage Active Truck Locations</h3>
+                    <div id="ownerLocationList" class="space-y-2 mb-3"></div>
+                    <div class="pt-2 border-t border-zinc-800 space-y-2">
+                        <input type="text" id="newLocName" placeholder="Location Name" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200">
+                        <input type="text" id="newLocAddress" placeholder="Street Address" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200">
+                        <button onclick="saveNewLocation()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-semibold py-2.5 rounded-xl text-xs transition">Add New Location</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Menu Item Modal -->
+    <div id="editMenuModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-2xl p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-2"><h3 id="editMenuModalTitle" class="font-bold text-base text-amber-500">Edit Menu Item</h3><button onclick="closeEditMenuModal()" class="text-zinc-400 hover:text-white text-sm">✕</button></div>
+            <input type="hidden" id="editMenuId">
+            <div><label class="block text-[11px] text-zinc-400 mb-1">Item Name</label><input type="text" id="editMenuName" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
+            <div><label class="block text-[11px] text-zinc-400 mb-1">Category</label><input type="text" id="editMenuCat" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
+            <div><label class="block text-[11px] text-zinc-400 mb-1">Price ($)</label><input type="number" step="0.01" id="editMenuPrice" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
+            <div><label class="block text-[11px] text-zinc-400 mb-1">Description</label><textarea id="editMenuDesc" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 h-16 resize-none"></textarea></div>
+            <div><label class="block text-[11px] text-zinc-400 mb-1">Prep Time (e.g. 3 mins)</label><input type="text" id="editMenuPrep" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
+            <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="editMenuSoldOut" class="w-4 h-4 accent-amber-500"><label class="text-xs text-zinc-300">Mark as Sold Out</label></div>
+            <button onclick="saveEditedMenuItem()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-xs transition mt-2">Save Menu Item</button>
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            get locations() { return JSON.parse(localStorage.getItem('foodtruck_locations')) || [
+                { id: 1, name: "Downtown Lot", address: "742 S 7th St, Phoenix, AZ 85004" }, 
+                { id: 2, name: "Central Station Spot", address: "1500 N Central Ave, Phoenix, AZ 85004" }
+            ]; },
+            set locations(val) { localStorage.setItem('foodtruck_locations', JSON.stringify(val)); },
+            get activeLocationId() { return parseInt(localStorage.getItem('foodtruck_active_loc')) || 1; },
+            set activeLocationId(val) { localStorage.setItem('foodtruck_active_loc', val); },
+            get isOpen() { return JSON.parse(localStorage.getItem('foodtruck_isopen')) ?? true; },
+            set isOpen(val) { localStorage.setItem('foodtruck_isopen', JSON.stringify(val)); },
+            get orders() { return JSON.parse(localStorage.getItem('foodtruck_orders')) || []; },
+            set orders(val) { localStorage.setItem('foodtruck_orders', JSON.stringify(val)); },
+            get history() { return JSON.parse(localStorage.getItem('foodtruck_history')) || []; },
+            set history(val) { localStorage.setItem('foodtruck_history', JSON.stringify(val)); },
+            get menu() { return JSON.parse(localStorage.getItem('foodtruck_menu')) || [
+                { id: 1, category: "Tacos & Specialties", name: "Taco", price: 3.50, desc: "Meat, cilantro, onion (Asada, Pastor, Cabeza, Birria, Pollo).", prep: "2 mins", soldOut: false, hasMeat: true },
+                { id: 2, category: "Tacos & Specialties", name: "Vampiro", price: 4.50, desc: "Meat, cheese, cilantro and onion on crispy tortilla.", prep: "3 mins", soldOut: false, hasMeat: true },
+                { id: 3, category: "Tacos & Specialties", name: "Quesabirria w/ Consomé", price: 5.50, desc: "Meat, cheese, cilantro, onion and rich beef broth consomé.", prep: "4 mins", soldOut: false, hasMeat: true },
+                { id: 4, category: "Tacos & Specialties", name: "Quesacamaron w/ Broth", price: 6.00, desc: "Shrimp, cheese, pico de gallo and its broth.", prep: "4 mins", soldOut: false, hasMeat: false },
+                { id: 5, category: "Main Entrées & Plates", name: "Burrito", price: 12.00, desc: "Meat, rice, beans, cabbage, cilantro, onion, guacamole.", prep: "5 mins", soldOut: false, hasMeat: true },
+                { id: 6, category: "Main Entrées & Plates", name: "Torta w/ Fries", price: 15.50, desc: "Meat, mayo, beans, chipotle sauce, cabbage, cilantro, onion, tomato, avocado, queso fresco, jalapeños w/ fries.", prep: "6 mins", soldOut: false, hasMeat: true },
+                { id: 7, category: "Main Entrées & Plates", name: "Carne Asada Fries", price: 15.00, desc: "Fries, meat, cheese, chipotle sauce, sour cream, avocado sauce, topped with guacamole.", prep: "5 mins", soldOut: false, hasMeat: true },
+                { id: 8, category: "Main Entrées & Plates", name: "Birria Nachos", price: 14.00, desc: "Meat, tortilla chips, nacho cheese, pico, jalapeños.", prep: "5 mins", soldOut: false, hasMeat: true },
+                { id: 9, category: "Main Entrées & Plates", name: "1/2 & 1/2", price: 17.00, desc: "Half Carne Asada Fries & half Birria Nachos.", prep: "6 mins", soldOut: false, hasMeat: false },
+                { id: 10, category: "Refreshing Drinks", name: "Agua Fresca", price: 4.00, desc: "Limonada de Pepino, Jamaica, Horchata.", isDrink: true, options: ["Limonada de Pepino", "Jamaica", "Horchata"], prep: "1 min", soldOut: false },
+                { id: 11, category: "Refreshing Drinks", name: "Mexican Coke / Jarritos", price: 3.50, desc: "Authentic bottled cane sugar beverages.", prep: "1 min", soldOut: false }
+            ]; },
+            set menu(val) { localStorage.setItem('foodtruck_menu', JSON.stringify(val)); }
+        };
+
+        function verifyOwnerPin() {
+            const pin = document.getElementById('ownerPinInput').value.trim();
+            if (pin === "1234") {
+                document.getElementById('loginView').style.display = 'none';
+                document.getElementById('ownerDashboardView').style.display = 'block';
+                initOwnerPortal();
+            } else {
+                alert("Incorrect PIN! Hint: 1234");
+            }
+        }
+
+        function lockOwnerPortal() {
+            document.getElementById('ownerDashboardView').style.display = 'none';
+            document.getElementById('loginView').style.display = 'flex';
+            document.getElementById('ownerPinInput').value = '';
+        }
+
+        function switchOwnerTab(tab) {
+            ['Orders', 'Menu', 'Locations'].forEach(t => {
+                document.getElementById(`ownerTab${t}`).style.display = 'none';
+                document.getElementById(`tabBtn${t}`).className = "bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2.5 rounded-xl text-xs transition";
+            });
+            document.getElementById(`ownerTab${tab}`).style.display = 'block';
+            document.getElementById(`tabBtn${tab}`).className = "bg-amber-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow";
+
+            if (tab === 'Orders') renderOwnerPortal();
+            if (tab === 'Menu') renderOwnerMenuEditor();
+            if (tab === 'Locations') renderLocationManagerList();
+        }
+
+        function initOwnerPortal() {
+            updateStoreStatusUI();
+            renderOwnerPortal();
+            renderOwnerMenuEditor();
+            renderLocationManagerList();
+        }
+
+        function updateStoreStatusUI() {
+            const label = document.getElementById('ownerStatusLabel');
+            const btn = document.getElementById('storeToggleBtn');
+            if (app.isOpen) {
+                label.innerText = "Open";
+                label.className = "text-emerald-400";
+                btn.innerText = "Close Store";
+                btn.className = "bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition";
+            } else {
+                label.innerText = "Closed";
+                label.className = "text-rose-400";
+                btn.innerText = "Open Store";
+                btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition";
+            }
+        }
+
+        function toggleStoreStatus() {
+            app.isOpen = !app.isOpen;
+            updateStoreStatusUI();
+        }
+
+        function renderOwnerPortal() {
+            const container = document.getElementById('ownerOrdersList');
+            const historyContainer = document.getElementById('historyOrdersList');
+            if(!container) return;
+            
+            const orders = app.orders;
+            if (orders.length === 0) {
+                container.innerHTML = `<div class="text-center text-zinc-500 py-6 text-xs bg-zinc-900 border border-zinc-800 rounded-xl">No incoming orders.</div>`;
+            } else {
+                container.innerHTML = orders.map(o => {
+                    const waitMins = Math.floor((Date.now() - o.timestamp) / 60000);
+                    return `
+                        <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex flex-col gap-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs text-amber-500 font-mono font-bold">#${o.id} (${o.name}) • Active: ${waitMins}m</span>
+                                    <h4 class="font-bold text-sm mt-1">${o.items}</h4>
+                                    ${o.notes ? `<p class="text-xs text-amber-400 mt-1">Note: ${o.notes}</p>` : ''}
+                                </div>
+                                <span class="font-bold text-emerald-400">$${o.total.toFixed(2)}</span>
+                            </div>
+                            <div class="flex gap-2 pt-2 border-t border-zinc-800/80">
+                                <button onclick="updateOrderStatus('${o.id}', '${o.status === 'Preparing' ? 'Ready' : 'Preparing'}')" class="flex-1 bg-amber-600 hover:bg-amber-500 py-1.5 rounded-lg text-xs font-medium">${o.status === 'Preparing' ? 'Mark Ready' : 'Set Preparing'}</button>
+                                <button onclick="completeOrder('${o.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 py-1.5 rounded-lg text-xs font-medium">Complete Order ✓</button>
+                                <button onclick="cancelOrder('${o.id}')" class="bg-rose-950 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg text-xs font-medium">Cancel</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const history = app.history;
+            if (historyContainer) {
+                if (history.length === 0) {
+                    historyContainer.innerHTML = `<div class="text-center text-zinc-500 py-4 text-xs bg-zinc-900 border border-zinc-800 rounded-xl">No history logs yet.</div>`;
+                } else {
+                    historyContainer.innerHTML = history.slice(0, 10).map(h => `
+                        <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl flex justify-between items-center text-xs">
+                            <div>
+                                <span class="font-mono font-bold text-amber-500">#${h.id} (${h.name})</span>
+                                <div class="text-zinc-300 mt-0.5">${h.items}</div>
+                                <div class="text-[10px] text-zinc-500 mt-1">$${h.total.toFixed(2)} • ${h.status}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        function updateOrderStatus(id, newStatus) { 
+            let orders = app.orders;
+            const o = orders.find(x => x.id === id); 
+            if (o) { 
+                o.status = newStatus; 
+                app.orders = orders;
+                renderOwnerPortal(); 
+            } 
+        }
+
+        function completeOrder(id) { 
+            let orders = app.orders;
+            const idx = orders.findIndex(x => x.id === id);
+            if (idx > -1) {
+                const completed = orders.splice(idx, 1)[0];
+                completed.status = "Completed";
+                app.orders = orders;
+                let history = app.history;
+                history.unshift(completed);
+                app.history = history;
+                renderOwnerPortal();
+            }
+        }
+
+        function cancelOrder(id) { 
+            if (confirm("Cancel order?")) { 
+                let orders = app.orders;
+                const idx = orders.findIndex(x => x.id === id);
+                if (idx > -1) {
+                    const canceled = orders.splice(idx, 1)[0];
+                    canceled.status = "Canceled";
+                    app.orders = orders;
+                    let history = app.history;
+                    history.unshift(canceled);
+                    app.history = history;
+                    renderOwnerPortal();
+                }
+            } 
+        }
+
+        function renderOwnerMenuEditor() {
+            const container = document.getElementById('ownerMenuList');
+            if (!container) return;
+            const menu = app.menu;
+            container.innerHTML = menu.map(item => `
+                <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl flex justify-between items-center text-xs">
+                    <div>
+                        <div class="font-bold flex items-center gap-2">${item.name} <span class="text-pink-500">$${item.price.toFixed(2)}</span> ${item.soldOut ? '<span class="text-[9px] bg-rose-500/20 text-rose-400 px-1 rounded">SOLD OUT</span>' : ''}</div>
+                        <div class="text-zinc-400 text-[10px] mt-0.5">${item.desc}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openEditMenuModal(${item.id})" class="bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded text-xs font-semibold">Edit</button>
+                        <button onclick="deleteMenuItem(${item.id})" class="text-rose-400 hover:underline px-1">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openNewMenuModal() {
+            document.getElementById('editMenuModalTitle').innerText = "Add New Menu Item";
+            document.getElementById('editMenuId').value = "";
+            document.getElementById('editMenuName').value = "";
+            document.getElementById('editMenuCat').value = "Tacos & Specialties";
+            document.getElementById('editMenuPrice').value = "";
+            document.getElementById('editMenuDesc').value = "";
+            document.getElementById('editMenuPrep').value = "3 mins";
+            document.getElementById('editMenuSoldOut').checked = false;
+            document.getElementById('editMenuModal').style.display = 'flex';
+        }
+
+        function openEditMenuModal(id) {
+            const item = app.menu.find(m => m.id === id);
+            if (!item) return;
+            document.getElementById('editMenuModalTitle').innerText = "Edit Menu Item";
+            document.getElementById('editMenuId').value = item.id;
+            document.getElementById('editMenuName').value = item.name;
+            document.getElementById('editMenuCat').value = item.category;
+            document.getElementById('editMenuPrice').value = item.price;
+            document.getElementById('editMenuDesc').value = item.desc;
+            document.getElementById('editMenuPrep').value = item.prep;
+            document.getElementById('editMenuSoldOut').checked = item.soldOut;
+            document.getElementById('editMenuModal').style.display = 'flex';
+        }
+
+        function closeEditMenuModal() {
+            document.getElementById('editMenuModal').style.display = 'none';
+        }
+
+        function saveEditedMenuItem() {
+            const id = document.getElementById('editMenuId').value;
+            const name = document.getElementById('editMenuName').value.trim();
+            const category = document.getElementById('editMenuCat').value.trim();
+            const price = parseFloat(document.getElementById('editMenuPrice').value);
+            const desc = document.getElementById('editMenuDesc').value.trim();
+            const prep = document.getElementById('editMenuPrep').value.trim();
+            const soldOut = document.getElementById('editMenuSoldOut').checked;
+
+            if (!name || isNaN(price)) { alert("Provide a valid name and price"); return; }
+            let menu = app.menu;
+
+            if (id) {
+                const item = menu.find(m => m.id == id);
+                if (item) {
+                    item.name = name;
+                    item.category = category;
+                    item.price = price;
+                    item.desc = desc;
+                    item.prep = prep;
+                    item.soldOut = soldOut;
+                }
+            } else {
+                const newItem = {
+                    id: Date.now(),
+                    category,
+                    name,
+                    price,
+                    desc,
+                    prep,
+                    soldOut,
+                    hasMeat: category.toLowerCase().includes('taco') || name.toLowerCase().includes('taco') || name.toLowerCase().includes('burrito')
+                };
+                menu.push(newItem);
+            }
+            app.menu = menu;
+            closeEditMenuModal();
+            renderOwnerMenuEditor();
+        }
+
+        function deleteMenuItem(id) {
+            if (confirm("Delete this menu item?")) {
+                let menu = app.menu.filter(m => m.id !== id);
+                app.menu = menu;
+                renderOwnerMenuEditor();
+            }
+        }
+
+        function renderLocationManagerList() {
+            const ownerContainer = document.getElementById('ownerLocationList');
+            const locations = app.locations;
+            const activeId = app.activeLocationId;
+            const html = locations.map(l => `
+                <div class="bg-zinc-950 p-2.5 rounded-lg border border-zinc-800 flex justify-between items-center text-xs">
+                    <div>
+                        <div class="font-bold text-zinc-200">${l.name} <input type="radio" name="activeLocRadio" ${l.id === activeId ? 'checked' : ''} onchange="setActiveLocation(${l.id})" class="ml-2 accent-amber-500"> Active</div>
+                        <div class="text-zinc-500 text-[10px]">${l.address}</div>
+                    </div>
+                    ${locations.length > 1 ? `<button onclick="deleteLocation(${l.id})" class="text-rose-400 hover:underline">Delete</button>` : ''}
+                </div>
+            `).join('');
+            if (ownerContainer) ownerContainer.innerHTML = html;
+        }
+
+        function setActiveLocation(id) {
+            app.activeLocationId = id;
+            renderLocationManagerList();
+        }
+
+        function saveNewLocation() {
+            const name = document.getElementById('newLocName').value.trim();
+            const address = document.getElementById('newLocAddress').value.trim();
+            if (!name || !address) { alert("Fill out both location fields"); return; }
+            let locations = app.locations;
+            locations.push({ id: Date.now(), name, address });
+            app.locations = locations;
+            document.getElementById('newLocName').value = '';
+            document.getElementById('newLocAddress').value = '';
+            renderLocationManagerList();
+        }
+
+        function deleteLocation(id) { 
+            let locations = app.locations;
+            locations = locations.filter(l => l.id !== id); 
+            app.locations = locations;
+            if(app.activeLocationId === id && locations.length > 0) {
+                app.activeLocationId = locations[0].id;
+            }
+            renderLocationManagerList(); 
+        }
+    </script>
+</body>
+</html>
