@@ -14,7 +14,7 @@
                 <span class="text-4xl">🌮</span>
             </div>
             <h1 class="text-3xl font-serif font-bold italic tracking-wide mb-1">El Taco De Ojo</h1>
-            <p class="text-zinc-400 text-sm mb-6">El Taco De Ojo Management</p>
+            <p class="text-zinc-400 text-sm mb-6">management</p>
 
             <div class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4 shadow-xl">
                 <div>
@@ -22,10 +22,6 @@
                     <input type="password" id="ownerPinInput" placeholder="Enter PIN (1234)" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 text-center tracking-widest font-mono">
                 </div>
                 <button onclick="verifyOwnerPin()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-pink-600/20">Enter Portal</button>
-            </div>
-
-            <div class="mt-12 text-center">
-                <a href="index.html" class="text-xs text-zinc-500 hover:text-zinc-300 font-medium">← Back to Customer Site</a>
             </div>
         </div>
 
@@ -37,29 +33,33 @@
                     <div class="w-8 h-8 rounded-full border border-pink-500 flex items-center justify-center text-sm">🌮</div>
                     <div>
                         <h2 class="font-bold text-base font-serif italic">El Taco De Ojo</h2>
-                        <p class="text-[10px] text-zinc-400">El Taco De Ojo Management</p>
+                        <p class="text-[10px] text-zinc-400">management</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="index.html" class="text-xs text-pink-400 hover:underline">Customer Site</a>
                     <button onclick="lockOwnerPortal()" class="text-xs text-rose-400 hover:underline">Lock</button>
                 </div>
             </div>
             
             <div class="grid grid-cols-4 gap-1.5 mb-4">
-                <button onclick="switchOwnerTab('orders')" id="tabBtnOrders" class="bg-pink-600 text-white font-semibold py-2 rounded-xl text-[11px] transition shadow">Orders</button>
-                <button onclick="switchOwnerTab('menu')" id="tabBtnMenu" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2 rounded-xl text-[11px] transition">Inventory</button>
-                <button onclick="switchOwnerTab('locations')" id="tabBtnLocations" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2 rounded-xl text-[11px] transition">Locations</button>
-                <button onclick="switchOwnerTab('analytics')" id="tabBtnAnalytics" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2 rounded-xl text-[11px] transition">Analytics</button>
+                <button onclick="switchOwnerTab('Orders')" id="tabBtnOrders" class="bg-pink-600 text-white font-semibold py-2 rounded-xl text-[11px] transition shadow">Orders</button>
+                <button onclick="switchOwnerTab('Menu')" id="tabBtnMenu" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2 rounded-xl text-[11px] transition">Inventory</button>
+                <button onclick="switchOwnerTab('Locations')" id="tabBtnLocations" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2 rounded-xl text-[11px] transition">Locations</button>
+                <button onclick="switchOwnerTab('Analytics')" id="tabBtnAnalytics" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2 rounded-xl text-[11px] transition">Analytics</button>
             </div>
 
             <!-- Tab 1: Orders -->
             <div id="ownerTabOrders" class="space-y-4">
                 <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
-                    <h3 class="font-semibold text-sm text-zinc-300">Operations & Wait Times</h3>
+                    <h3 class="font-semibold text-sm text-zinc-300">Operations & Timesheet Log</h3>
                     <div class="flex items-center justify-between bg-zinc-950 p-3 rounded-lg border border-zinc-800 text-xs">
                         <span>Store Status: <strong id="ownerStatusLabel" class="text-emerald-400">Open</strong></span>
                         <button onclick="toggleStoreStatus()" id="storeToggleBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">Close Store</button>
+                    </div>
+                    <!-- Closing Time Control -->
+                    <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800 flex items-center justify-between text-xs">
+                        <span class="text-zinc-400">Display Closing Time:</span>
+                        <input type="text" id="closingTimeInput" onchange="updateClosingTime(this.value)" value="6:00 PM" class="bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-pink-400 font-mono w-24 text-center">
                     </div>
                     <!-- Extra Wait Time Warning Controls -->
                     <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800 space-y-2">
@@ -70,13 +70,28 @@
                             <button onclick="setExtraWait('30')" id="waitBtn30" class="bg-zinc-800 hover:bg-zinc-700 text-rose-400 py-1.5 rounded text-[11px] font-semibold">+30m (Very Busy)</button>
                         </div>
                     </div>
-                    <!-- Logged Hours -->
-                    <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800 space-y-2">
-                        <div class="flex justify-between items-center text-[11px] text-zinc-400 font-medium">
-                            <span>Logged Operating Hours:</span>
-                            <button onclick="editLoggedHours()" class="text-pink-400 hover:underline">Edit Hours</button>
+                    <!-- Timesheet Logging Section -->
+                    <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800 space-y-3">
+                        <div class="flex justify-between items-center text-xs font-semibold text-pink-400">
+                            <span>⏱️ Company Timesheet & Hours</span>
+                            <span id="totalCombinedHoursDisplay" class="font-mono">0.0 total hrs</span>
                         </div>
-                        <div id="loggedHoursDisplay" class="text-xs font-mono text-zinc-200">0.0 hours today</div>
+                        <div class="flex justify-between items-center text-xs bg-zinc-900 p-2.5 rounded border border-zinc-800">
+                            <span>Main Truck Operating Hours:</span>
+                            <div class="flex items-center gap-2">
+                                <span id="truckHoursDisplay" class="font-mono font-bold text-zinc-200">0.0h</span>
+                                <button onclick="editTruckHours()" class="text-xs text-pink-400 hover:underline">Edit</button>
+                            </div>
+                        </div>
+                        <!-- Employee Profiles Timesheet -->
+                        <div class="space-y-2 pt-1">
+                            <div class="text-[11px] text-zinc-400 font-medium">Employee Profiles & Hours Log:</div>
+                            <div id="employeeTimesheetList" class="space-y-2"></div>
+                            <div class="flex gap-2 pt-1">
+                                <input type="text" id="newEmployeeName" placeholder="Employee Name" class="flex-1 bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200">
+                                <button onclick="addEmployee()" class="bg-pink-600 hover:bg-pink-500 text-white px-3 py-1.5 rounded text-xs font-semibold">Add Employee</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -91,11 +106,12 @@
                     </button>
                     <div id="historyCollapseContainer" class="hidden p-3 border-t border-zinc-800 space-y-2.5 max-h-64 overflow-y-auto">
                         <div id="historyOrdersList" class="space-y-2"></div>
+                        <button onclick="clearHistoryLogs()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-rose-400 py-2 rounded-lg text-xs font-semibold transition mt-2">Clear Order History</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 2: Menu / Inventory Editor (Matching User Screenshot style) -->
+            <!-- Tab 2: Menu / Inventory Editor -->
             <div id="ownerTabMenu" class="space-y-4 hidden">
                 <button onclick="openNewMenuModal()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-semibold py-3 rounded-xl text-xs transition shadow-lg shadow-pink-600/20">+ Add New Menu Item</button>
                 <div id="ownerMenuList" class="space-y-3"></div>
@@ -109,12 +125,12 @@
                     <div class="pt-2 border-t border-zinc-800 space-y-2">
                         <input type="text" id="newLocName" placeholder="Location Name (e.g. Downtown)" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200">
                         <input type="text" id="newLocAddress" placeholder="Street Address" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200">
-                        <button onclick="saveNewLocation()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-semibold py-2.5 rounded-xl text-xs transition">Add / Update Location</button>
+                        <button onclick="saveNewLocation()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-semibold py-2.5 rounded-xl text-xs transition">Add / Clear Location</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 4: Analytics Financial Statement -->
+            <!-- Tab 4: Analytics Financial Statement & Wait Times -->
             <div id="ownerTabAnalytics" class="space-y-4 hidden">
                 <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4">
                     <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -138,6 +154,15 @@
                             <span class="text-zinc-400">Yearly Revenue:</span>
                             <span id="statYearly" class="font-mono font-bold text-emerald-400">$0.00</span>
                         </div>
+                        <div class="flex justify-between p-2.5 bg-zinc-950 rounded-lg border border-zinc-800">
+                            <span class="text-zinc-400">Average Wait Time per Order:</span>
+                            <span id="statAvgWait" class="font-mono font-bold text-pink-400">0 mins</span>
+                        </div>
+                    </div>
+                    <!-- Daily Brief Highest Wait Times -->
+                    <div class="pt-2 border-t border-zinc-800 space-y-2">
+                        <div class="text-xs font-bold text-zinc-300">📈 Daily Brief: Highest Wait Times</div>
+                        <div id="highestWaitBriefList" class="space-y-1.5 text-xs"></div>
                     </div>
                     <button onclick="clearHistoryLogs()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-rose-400 py-2 rounded-xl text-xs font-semibold transition">Clear Analytics & History</button>
                 </div>
@@ -152,7 +177,10 @@
             <input type="hidden" id="editMenuId">
             <div><label class="block text-[11px] text-zinc-400 mb-1">Item Name</label><input type="text" id="editMenuName" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
             <div><label class="block text-[11px] text-zinc-400 mb-1">Category</label><input type="text" id="editMenuCat" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
-            <div><label class="block text-[11px] text-zinc-400 mb-1">Price ($)</label><input type="number" step="0.01" id="editMenuPrice" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
+            <div class="grid grid-cols-2 gap-2">
+                <div><label class="block text-[11px] text-zinc-400 mb-1">Regular Price ($)</label><input type="number" step="0.01" id="editMenuPrice" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
+                <div><label class="block text-[11px] text-pink-400 mb-1">Markdown Sale ($)</label><input type="number" step="0.01" id="editMenuMarkdown" placeholder="Optional" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
+            </div>
             <div><label class="block text-[11px] text-zinc-400 mb-1">Description</label><textarea id="editMenuDesc" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 h-16 resize-none"></textarea></div>
             <div><label class="block text-[11px] text-zinc-400 mb-1">Prep Time Weight (e.g. 2 mins)</label><input type="text" id="editMenuPrep" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
             <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="editMenuSoldOut" class="w-4 h-4 accent-pink-500"><label class="text-xs text-zinc-300">Mark as Sold Out</label></div>
@@ -181,26 +209,30 @@
             set activeLocationId(val) { localStorage.setItem('foodtruck_active_loc', val); },
             get isOpen() { return JSON.parse(localStorage.getItem('foodtruck_isopen')) ?? true; },
             set isOpen(val) { localStorage.setItem('foodtruck_isopen', JSON.stringify(val)); },
+            get closingTime() { return localStorage.getItem('foodtruck_closingtime') || "6:00 PM"; },
+            set closingTime(val) { localStorage.setItem('foodtruck_closingtime', val); },
             get orders() { return JSON.parse(localStorage.getItem('foodtruck_orders')) || []; },
             set orders(val) { localStorage.setItem('foodtruck_orders', JSON.stringify(val)); },
             get history() { return JSON.parse(localStorage.getItem('foodtruck_history')) || []; },
             set history(val) { localStorage.setItem('foodtruck_history', JSON.stringify(val)); },
             get extraWait() { return localStorage.getItem('foodtruck_extrawait') || ''; },
             set extraWait(val) { localStorage.setItem('foodtruck_extrawait', val); },
-            get hoursLogged() { return parseFloat(localStorage.getItem('foodtruck_hours')) || 0.0; },
-            set hoursLogged(val) { localStorage.setItem('foodtruck_hours', val); },
+            get truckHours() { return parseFloat(localStorage.getItem('foodtruck_truck_hours')) || 0.0; },
+            set truckHours(val) { localStorage.setItem('foodtruck_truck_hours', val); },
+            get employees() { return JSON.parse(localStorage.getItem('foodtruck_employees')) || []; },
+            set employees(val) { localStorage.setItem('foodtruck_employees', JSON.stringify(val)); },
             get menu() { return JSON.parse(localStorage.getItem('foodtruck_menu')) || [
-                { id: 1, category: "Tacos & Specialties", name: "Taco", price: 3.50, desc: "Meat, cilantro, onion (Asada, Pastor, Cabeza, Birria, Pollo).", prep: "2 mins", soldOut: false, hasMeat: true },
-                { id: 2, category: "Tacos & Specialties", name: "Vampiro", price: 4.50, desc: "Meat, cheese, cilantro and onion on crispy tortilla.", prep: "3 mins", soldOut: false, hasMeat: true },
-                { id: 3, category: "Tacos & Specialties", name: "Quesabirria w/ Consomé", price: 5.50, desc: "Meat, cheese, cilantro, onion and rich beef broth consomé.", prep: "3 mins", soldOut: false, hasMeat: true },
-                { id: 4, category: "Tacos & Specialties", name: "Quesacamaron w/ Broth", price: 6.00, desc: "Shrimp, cheese, pico de gallo and its broth.", prep: "4 mins", soldOut: false, hasMeat: false },
-                { id: 5, category: "Main Entrées & Plates", name: "Burrito", price: 12.00, desc: "Meat, rice, beans, cabbage, cilantro, onion, guacamole.", prep: "5 mins", soldOut: false, hasMeat: true },
-                { id: 6, category: "Main Entrées & Plates", name: "Torta w/ Fries", price: 15.50, desc: "Meat, mayo, beans, chipotle sauce, cabbage, cilantro, onion, tomato, avocado, queso fresco, jalapeños w/ fries.", prep: "8 mins", soldOut: false, hasMeat: true },
-                { id: 7, category: "Main Entrées & Plates", name: "Carne Asada Fries", price: 15.00, desc: "Fries, meat, cheese, chipotle sauce, sour cream, avocado sauce, topped with guacamole.", prep: "6 mins", soldOut: false, hasMeat: true },
-                { id: 8, category: "Main Entrées & Plates", name: "Birria Nachos", price: 14.00, desc: "Meat, tortilla chips, nacho cheese, pico, jalapeños.", prep: "5 mins", soldOut: false, hasMeat: true },
-                { id: 9, category: "Main Entrées & Plates", name: "1/2 & 1/2", price: 17.00, desc: "Half Carne Asada Fries & half Birria Nachos.", prep: "7 mins", soldOut: false, hasMeat: false },
-                { id: 10, category: "Refreshing Drinks", name: "Agua Fresca", price: 4.00, desc: "Limonada de Pepino, Jamaica, Horchata.", isDrink: true, options: ["Limonada de Pepino", "Jamaica", "Horchata"], prep: "1 min", soldOut: false },
-                { id: 11, category: "Refreshing Drinks", name: "Mexican Coke / Jarritos", price: 3.50, desc: "Authentic bottled cane sugar beverages.", prep: "1 min", soldOut: false }
+                { id: 1, category: "Tacos & Specialties", name: "Taco", price: 3.50, markdownPrice: null, desc: "Meat, cilantro, onion (Asada, Pastor, Cabeza, Birria, Pollo).", prep: "2 mins", soldOut: false, hasMeat: true },
+                { id: 2, category: "Tacos & Specialties", name: "Vampiro", price: 4.50, markdownPrice: null, desc: "Meat, cheese, cilantro and onion on crispy tortilla.", prep: "3 mins", soldOut: false, hasMeat: true },
+                { id: 3, category: "Tacos & Specialties", name: "Quesabirria w/ Consomé", price: 5.50, markdownPrice: null, desc: "Meat, cheese, cilantro, onion and rich beef broth consomé.", prep: "3 mins", soldOut: false, hasMeat: true },
+                { id: 4, category: "Tacos & Specialties", name: "Quesacamaron w/ Broth", price: 6.00, markdownPrice: null, desc: "Shrimp, cheese, pico de gallo and its broth.", prep: "4 mins", soldOut: false, hasMeat: false },
+                { id: 5, category: "Main Entrées & Plates", name: "Burrito", price: 12.00, markdownPrice: null, desc: "Meat, rice, beans, cabbage, cilantro, onion, guacamole.", prep: "5 mins", soldOut: false, hasMeat: true },
+                { id: 6, category: "Main Entrées & Plates", name: "Torta w/ Fries", price: 15.50, markdownPrice: null, desc: "Meat, mayo, beans, chipotle sauce, cabbage, cilantro, onion, tomato, avocado, queso fresco, jalapeños w/ fries.", prep: "8 mins", soldOut: false, hasMeat: true },
+                { id: 7, category: "Main Entrées & Plates", name: "Carne Asada Fries", price: 15.00, markdownPrice: null, desc: "Fries, meat, cheese, chipotle sauce, sour cream, avocado sauce, topped with guacamole.", prep: "6 mins", soldOut: false, hasMeat: true },
+                { id: 8, category: "Main Entrées & Plates", name: "Birria Nachos", price: 14.00, markdownPrice: null, desc: "Meat, tortilla chips, nacho cheese, pico, jalapeños.", prep: "5 mins", soldOut: false, hasMeat: true },
+                { id: 9, category: "Main Entrées & Plates", name: "1/2 & 1/2", price: 17.00, markdownPrice: null, desc: "Half Carne Asada Fries & half Birria Nachos.", prep: "7 mins", soldOut: false, hasMeat: false },
+                { id: 10, category: "Refreshing Drinks", name: "Agua Fresca", price: 4.00, markdownPrice: null, desc: "Limonada de Pepino, Jamaica, Horchata.", isDrink: true, options: ["Limonada de Pepino", "Jamaica", "Horchata"], prep: "1 min", soldOut: false },
+                { id: 11, category: "Refreshing Drinks", name: "Mexican Coke / Jarritos", price: 3.50, markdownPrice: null, desc: "Authentic bottled cane sugar beverages.", prep: "1 min", soldOut: false }
             ]; },
             set menu(val) { localStorage.setItem('foodtruck_menu', JSON.stringify(val)); }
         };
@@ -222,26 +254,27 @@
             document.getElementById('ownerPinInput').value = '';
         }
 
-        function switchOwnerTab(tab) {
+        function switchOwnerTab(tabName) {
             ['Orders', 'Menu', 'Locations', 'Analytics'].forEach(t => {
                 const el = document.getElementById(`ownerTab${t}`);
                 const btn = document.getElementById(`tabBtn${t}`);
-                if (el) el.style.display = 'none';
-                if (btn) btn.className = "bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2 rounded-xl text-[11px] transition";
+                if (el) el.style.display = (t === tabName) ? 'block' : 'none';
+                if (btn) btn.className = (t === tabName) ? 
+                    "bg-pink-600 text-white font-semibold py-2 rounded-xl text-[11px] transition shadow" : 
+                    "bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold py-2 rounded-xl text-[11px] transition";
             });
-            document.getElementById(`ownerTab${tab}`).style.display = 'block';
-            document.getElementById(`tabBtn${tab}`).className = "bg-pink-600 text-white font-semibold py-2 rounded-xl text-[11px] transition shadow";
 
-            if (tab === 'Orders') renderOwnerPortal();
-            if (tab === 'Menu') renderOwnerMenuEditor();
-            if (tab === 'Locations') renderLocationManagerList();
-            if (tab === 'Analytics') renderAnalytics();
+            if (tabName === 'Orders') renderOwnerPortal();
+            if (tabName === 'Menu') renderOwnerMenuEditor();
+            if (tabName === 'Locations') renderLocationManagerList();
+            if (tabName === 'Analytics') renderAnalytics();
         }
 
         function initOwnerPortal() {
             updateStoreStatusUI();
             updateWaitTimeUI();
-            updateLoggedHoursUI();
+            updateTimesheetUI();
+            document.getElementById('closingTimeInput').value = app.closingTime;
             renderOwnerPortal();
             renderOwnerMenuEditor();
             renderLocationManagerList();
@@ -266,23 +299,84 @@
         function toggleStoreStatus() {
             app.isOpen = !app.isOpen;
             if (app.isOpen) {
-                app.hoursLogged += 1.0; // Automatically log an increment when opened
+                app.truckHours += 1.0; // Automatically log main truck hours when opened
             }
             updateStoreStatusUI();
-            updateLoggedHoursUI();
+            updateTimesheetUI();
         }
 
-        function updateLoggedHoursUI() {
-            const disp = document.getElementById('loggedHoursDisplay');
-            if (disp) disp.innerText = `${app.hoursLogged.toFixed(1)} hours logged`;
+        function updateClosingTime(val) {
+            app.closingTime = val.trim() || "6:00 PM";
         }
 
-        function editLoggedHours() {
-            const val = prompt("Enter total operating hours logged:", app.hoursLogged);
-            if (val !== null && !isNaN(parseFloat(val))) {
-                app.hoursLogged = parseFloat(val);
-                updateLoggedHoursUI();
+        function updateTimesheetUI() {
+            document.getElementById('truckHoursDisplay').innerText = `${app.truckHours.toFixed(1)}h`;
+            const employees = app.employees;
+            const empList = document.getElementById('employeeTimesheetList');
+            const totalEmpHours = employees.reduce((sum, e) => sum + e.hours, 0);
+            const totalCombined = app.truckHours + totalEmpHours;
+            document.getElementById('totalCombinedHoursDisplay').innerText = `${totalCombined.toFixed(1)} total hrs`;
+
+            if (empList) {
+                if (employees.length === 0) {
+                    empList.innerHTML = `<div class="text-[11px] text-zinc-500">No employees added yet.</div>`;
+                } else {
+                    empList.innerHTML = employees.map((emp, idx) => `
+                        <div class="flex justify-between items-center bg-zinc-900 p-2 rounded border border-zinc-800 text-xs">
+                            <span class="font-medium text-zinc-200">${emp.name}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono text-pink-400">${emp.hours.toFixed(1)} hrs</span>
+                                <button onclick="adjustEmployeeHours(${idx}, 1.0)" class="bg-zinc-800 px-1.5 py-0.5 rounded text-[10px]">+1h</button>
+                                <button onclick="editEmployeeHours(${idx})" class="text-zinc-400 hover:underline text-[10px]">Edit</button>
+                                <button onclick="removeEmployee(${idx})" class="text-rose-400 text-[10px]">✕</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
             }
+        }
+
+        function editTruckHours() {
+            const val = prompt("Enter main truck operating hours:", app.truckHours);
+            if (val !== null && !isNaN(parseFloat(val))) {
+                app.truckHours = parseFloat(val);
+                updateTimesheetUI();
+            }
+        }
+
+        function addEmployee() {
+            const nameInput = document.getElementById('newEmployeeName');
+            const name = nameInput.value.trim();
+            if (!name) { alert("Enter employee name"); return; }
+            let employees = app.employees;
+            employees.push({ name, hours: 0.0 });
+            app.employees = employees;
+            nameInput.value = '';
+            updateTimesheetUI();
+        }
+
+        function adjustEmployeeHours(idx, delta) {
+            let employees = app.employees;
+            employees[idx].hours += delta;
+            app.employees = employees;
+            updateTimesheetUI();
+        }
+
+        function editEmployeeHours(idx) {
+            let employees = app.employees;
+            const val = prompt(`Enter hours for ${employees[idx].name}:`, employees[idx].hours);
+            if (val !== null && !isNaN(parseFloat(val))) {
+                employees[idx].hours = parseFloat(val);
+                app.employees = employees;
+                updateTimesheetUI();
+            }
+        }
+
+        function removeEmployee(idx) {
+            let employees = app.employees;
+            employees.splice(idx, 1);
+            app.employees = employees;
+            updateTimesheetUI();
         }
 
         function setExtraWait(val) {
@@ -380,6 +474,8 @@
             if (idx > -1) {
                 const completed = orders.splice(idx, 1)[0];
                 completed.status = "Fulfilled";
+                completed.completedTimestamp = Date.now();
+                completed.fulfillmentWaitMins = Math.floor((completed.completedTimestamp - completed.timestamp) / 60000);
                 app.orders = orders;
                 let history = app.history;
                 history.unshift(completed);
@@ -395,6 +491,8 @@
                 if (idx > -1) {
                     const canceled = orders.splice(idx, 1)[0];
                     canceled.status = "Canceled";
+                    canceled.completedTimestamp = Date.now();
+                    canceled.fulfillmentWaitMins = Math.floor((canceled.completedTimestamp - canceled.timestamp) / 60000);
                     app.orders = orders;
                     let history = app.history;
                     history.unshift(canceled);
@@ -404,22 +502,35 @@
             } 
         }
 
+        function clearHistoryLogs() {
+            if (confirm("Clear all order history and analytics logs?")) {
+                app.history = [];
+                renderOwnerPortal();
+                renderAnalytics();
+            }
+        }
+
         function renderOwnerMenuEditor() {
             const container = document.getElementById('ownerMenuList');
             if (!container) return;
             const menu = app.menu;
-            container.innerHTML = menu.map(item => `
-                <div class="bg-zinc-900 border border-zinc-800 p-3.5 rounded-xl flex justify-between items-center text-xs">
-                    <div>
-                        <div class="font-bold text-zinc-100">${item.name} (${item.category.includes('Taco') ? '1' : '1'}) ($${item.price.toFixed(2)})</div>
-                        <div class="text-pink-400 text-[11px] mt-0.5">Prep Time Weight: ${item.prep}</div>
+            container.innerHTML = menu.map(item => {
+                const hasSale = item.markdownPrice !== null && item.markdownPrice !== undefined && item.markdownPrice < item.price;
+                return `
+                    <div class="bg-zinc-900 border border-zinc-800 p-3.5 rounded-xl flex justify-between items-center text-xs">
+                        <div>
+                            <div class="font-bold text-zinc-100 flex items-center gap-1.5">
+                                ${item.name} ($${item.price.toFixed(2)}${hasSale ? ` → <span class="text-pink-400">$${item.markdownPrice.toFixed(2)} Sale</span>` : ''})
+                            </div>
+                            <div class="text-pink-400 text-[11px] mt-0.5">Prep Time Weight: ${item.prep}</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openEditMenuModal(${item.id})" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-lg text-xs font-semibold">Edit</button>
+                            <button onclick="toggleSoldOut(${item.id})" class="${item.soldOut ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-zinc-800 text-zinc-400'} px-3 py-1.5 rounded-lg text-xs font-semibold">Sold Out</button>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="openEditMenuModal(${item.id})" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-lg text-xs font-semibold">Edit</button>
-                        <button onclick="toggleSoldOut(${item.id})" class="${item.soldOut ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-zinc-800 text-zinc-400'} px-3 py-1.5 rounded-lg text-xs font-semibold">${item.soldOut ? 'Sold Out' : 'Sold Out'}</button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function toggleSoldOut(id) {
@@ -438,6 +549,7 @@
             document.getElementById('editMenuName').value = "";
             document.getElementById('editMenuCat').value = "Tacos & Specialties";
             document.getElementById('editMenuPrice').value = "";
+            document.getElementById('editMenuMarkdown').value = "";
             document.getElementById('editMenuDesc').value = "";
             document.getElementById('editMenuPrep').value = "3 mins";
             document.getElementById('editMenuSoldOut').checked = false;
@@ -452,6 +564,7 @@
             document.getElementById('editMenuName').value = item.name;
             document.getElementById('editMenuCat').value = item.category;
             document.getElementById('editMenuPrice').value = item.price;
+            document.getElementById('editMenuMarkdown').value = (item.markdownPrice !== null && item.markdownPrice !== undefined) ? item.markdownPrice : '';
             document.getElementById('editMenuDesc').value = item.desc;
             document.getElementById('editMenuPrep').value = item.prep;
             document.getElementById('editMenuSoldOut').checked = item.soldOut;
@@ -467,6 +580,8 @@
             const name = document.getElementById('editMenuName').value.trim();
             const category = document.getElementById('editMenuCat').value.trim();
             const price = parseFloat(document.getElementById('editMenuPrice').value);
+            const markdownInput = document.getElementById('editMenuMarkdown').value.trim();
+            const markdownPrice = markdownInput !== '' ? parseFloat(markdownInput) : null;
             const desc = document.getElementById('editMenuDesc').value.trim();
             const prep = document.getElementById('editMenuPrep').value.trim();
             const soldOut = document.getElementById('editMenuSoldOut').checked;
@@ -480,6 +595,7 @@
                     item.name = name;
                     item.category = category;
                     item.price = price;
+                    item.markdownPrice = markdownPrice;
                     item.desc = desc;
                     item.prep = prep;
                     item.soldOut = soldOut;
@@ -490,6 +606,7 @@
                     category,
                     name,
                     price,
+                    markdownPrice,
                     desc,
                     prep,
                     soldOut,
@@ -582,18 +699,32 @@
             const fulfilled = history.filter(h => h.status === 'Fulfilled');
             const totalRev = fulfilled.reduce((sum, h) => sum + h.total, 0);
             
-            // Simple calculation for statement display
             document.getElementById('statDaily').innerText = `$${totalRev.toFixed(2)}`;
             document.getElementById('statWeekly').innerText = `$${totalRev.toFixed(2)}`;
             document.getElementById('statMonthly').innerText = `$${totalRev.toFixed(2)}`;
             document.getElementById('statYearly').innerText = `$${totalRev.toFixed(2)}`;
-        }
 
-        function clearHistoryLogs() {
-            if (confirm("Clear all order history and analytics logs?")) {
-                app.history = [];
-                renderOwnerPortal();
-                renderAnalytics();
+            const allFinished = history.filter(h => h.fulfillmentWaitMins !== undefined);
+            let avgWait = 0;
+            if (allFinished.length > 0) {
+                const totalMins = allFinished.reduce((sum, h) => sum + h.fulfillmentWaitMins, 0);
+                avgWait = Math.round(totalMins / allFinished.length);
+            }
+            document.getElementById('statAvgWait').innerText = `${avgWait} mins`;
+
+            const highestBriefContainer = document.getElementById('highestWaitBriefList');
+            if (highestBriefContainer) {
+                if (allFinished.length === 0) {
+                    highestBriefContainer.innerHTML = `<div class="text-zinc-500 text-[11px]">No completed orders with wait time data yet.</div>`;
+                } else {
+                    const sortedByWait = [...allFinished].sort((a, b) => b.fulfillmentWaitMins - a.fulfillmentWaitMins).slice(0, 3);
+                    highestBriefContainer.innerHTML = sortedByWait.map(o => `
+                        <div class="flex justify-between items-center bg-zinc-950 p-2 rounded border border-zinc-800 text-[11px]">
+                            <span class="font-mono text-zinc-300">#${o.id} (${o.name})</span>
+                            <span class="font-bold text-amber-400">${o.fulfillmentWaitMins} mins wait</span>
+                        </div>
+                    `).join('');
+                }
             }
         }
     </script>
