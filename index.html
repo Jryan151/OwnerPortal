@@ -184,6 +184,7 @@
                                 <li><strong>Live Orders:</strong> Accept incoming orders, mark them as preparing, and clear them when fulfilled.</li>
                                 <li><strong>Store Status:</strong> Toggle your truck Open or Closed for customers.</li>
                                 <li><strong>Wait Times:</strong> Add extra minutes to the estimated wait during busy rushes.</li>
+                                <li><strong>Prep Times:</strong> Customize individual prep times for items to accurately calculate order wait times.</li>
                                 <li><strong>Timesheets:</strong> Log your truck's operational hours and individual employee shift hours.</li>
                             </ul>
                         </div>
@@ -201,7 +202,7 @@
                             <div class="font-bold text-pink-400 text-sm mb-1">📍 Locations Tab</div>
                             <ul class="text-xs text-zinc-400 space-y-1.5 list-disc pl-4">
                                 <li><strong>Addresses:</strong> Add, edit, or delete truck locations for your schedule.</li>
-                                <li><strong>Active Route:</strong> Select which location is currently active to display it on the customer app.</li>
+                                <li><strong>Active Route:</strong> Select which location is currently active to display it on the customer website.</li>
                             </ul>
                         </div>
                         
@@ -231,7 +232,7 @@
                 <div><label class="block text-[11px] text-pink-400 mb-1">Markdown Sale ($)</label><input type="number" step="0.01" id="editMenuMarkdown" placeholder="Optional" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
             </div>
             <div><label class="block text-[11px] text-zinc-400 mb-1">Description</label><textarea id="editMenuDesc" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 h-16 resize-none"></textarea></div>
-            <div><label class="block text-[11px] text-zinc-400 mb-1">Prep Time Weight (e.g. 2 mins)</label><input type="text" id="editMenuPrep" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
+            <div><label class="block text-[11px] text-zinc-400 mb-1">Prep Time (e.g. 2 mins)</label><input type="text" id="editMenuPrep" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200"></div>
             <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="editMenuSoldOut" class="w-4 h-4 accent-pink-500"><label class="text-xs text-zinc-300">Mark as Sold Out</label></div>
             <button onclick="saveEditedMenuItem()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-semibold py-2.5 rounded-xl text-xs transition mt-2">Save Menu Item</button>
         </div>
@@ -251,7 +252,15 @@
     <script>
         const app = {
             get locations() { return JSON.parse(localStorage.getItem('foodtruck_locations')) || [
-                { id: 1, name: "Downtown Lot", address: "742 S 7th St, Phoenix, AZ 85004" }
+                { id: 1, name: "Trunk or Treat", address: "3541 W Thunderbird Rd, Phoenix, AZ 85053" },
+                { id: 2, name: "Laguna @Arrowhead", address: "20251 N 75th ave Glendale, AZ" },
+                { id: 3, name: "Cobblestone", address: "15449 N 25th Ave, Phoenix, AZ" },
+                { id: 4, name: "Zoneluxe", address: "9450 W Cabela Dr, Glendale, AZ" },
+                { id: 5, name: "Olive Tree", address: "6201 W Olive Ave, Glendale, AZ" },
+                { id: 6, name: "Portola North", address: "2700 W Sahuaro Dr, Phoenix, AZ" },
+                { id: 7, name: "Peoria Lot", address: "8815 Peoria Ave #11, Peoria, AZ 85345" },
+                { id: 8, name: "Manzanita Elementary", address: "8430 N 39TH AVE, Phoenix, AZ" },
+                { id: 9, name: "7th St Lot", address: "20425 N 7TH ST PHOENIX, AZ 85024" }
             ]; },
             set locations(val) { localStorage.setItem('foodtruck_locations', JSON.stringify(val)); },
             get activeLocationId() { return parseInt(localStorage.getItem('foodtruck_active_loc')) || 1; },
@@ -581,7 +590,7 @@
                             <div class="font-bold text-zinc-100 flex items-center gap-1.5">
                                 ${item.name} ($${item.price.toFixed(2)}${hasSale ? ` → <span class="text-pink-400">$${item.markdownPrice.toFixed(2)} Sale</span>` : ''})
                             </div>
-                            <div class="text-pink-400 text-[11px] mt-0.5">Prep Time Weight: ${item.prep}</div>
+                            <div class="text-pink-400 text-[11px] mt-0.5">Prep Time: ${item.prep}</div>
                         </div>
                         <div class="flex items-center gap-2">
                             <button onclick="openEditMenuModal(${item.id})" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-lg text-xs font-semibold">Edit</button>
